@@ -1,0 +1,52 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- task: HCLTechnologies.ApplicationSecurity-VSTS.custom-ase-task.HCL AppScan Enterprise@2
+  displayName: 'Run HCL AppScan Enterprise Security Test'
+  inputs:
+    ServiceEndPointAse: 'ASE_Parimal_Joy'
+    jobName: Critical
+    folderId: 7
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    arguments: '$(ETA)'
+    templateId: 13
+    testPolicyId: 8
+    applicationId: 30
+    startingURL: 'http://demo.testfire.net'
+    trafficFile: 'DTF_Login_NewHTTPS.dast.config'
+    loginMethod: None
+    optimization: Fastest
+    failBuildConfiguration: true
+    buildfailTotal: false
+    buildfailCritical: false
+    buildfailHigh: false
+    buildfailMedium: false
+    buildfailLow: false
+    aadSqlPassword: 
+    aadSqlUsername: 
+
+appendCommitMessageToRunName:
+
+- task: HCL AppScan Enterprise@2
+  inputs:
+    ServiceEndPointAse: 'ASE_Parimal_Joy'
+    jobName: 'TestASE'
+    folderId: 8
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+  displayName: 'Run a multi-line script'
